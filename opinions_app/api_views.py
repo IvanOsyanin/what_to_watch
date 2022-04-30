@@ -1,5 +1,3 @@
-from random import randrange
-
 from flask import jsonify, request
 
 from . import app, db
@@ -72,4 +70,3 @@ def get_random_opinion():
     if opinion is not None:
         return jsonify({'opinion': opinion.to_dict()}), 200
     raise InvalidAPIUsage('В базе данных нет мнений', 404)
-
