@@ -7,14 +7,20 @@ from .forms import OpinionForm
 from .models import Opinion
 
 
+def random_opinion():
+    quantity = Opinion.query.count()
+    if quantity:
+        offset_value = randrange(quantity)
+        opinion = Opinion.query.offset(offset_value).first()
+        return opinion
+
+
 @app.route('/')
 def index_view():
-    quantity = Opinion.query.count()
-    if not quantity:
-        abort(404)
-    offset_value = randrange(quantity)
-    opinion = Opinion.query.offset(offset_value).first()
-    return render_template('opinion.html', opinion=opinion)
+    opinion = random_opinion()
+    if opinion is not None:
+        return render_template('opinion.html', opinion=opinion) # noqa
+    abort(404)
 
 
 @app.route('/add', methods=['GET', 'POST'])
@@ -24,7 +30,7 @@ def add_opinion_view():
         text = form.text.data
         if Opinion.query.filter_by(text=text).first():
             flash('Такое мнение уже было оставлено ранее!')
-            return render_template('add_opinion.html', form=form)
+            return render_template('add_opinion.html', form=form) # noqa
         opinion = Opinion(
             title=form.title.data,
             text=form.text.data,
@@ -33,10 +39,10 @@ def add_opinion_view():
         db.session.add(opinion)
         db.session.commit()
         return redirect(url_for('opinion_view', id=opinion.id))
-    return render_template('add_opinion.html', form=form)
+    return render_template('add_opinion.html', form=form) # noqa
 
 
 @app.route('/opinions/<int:id>')
 def opinion_view(id):
     opinion = Opinion.query.get_or_404(id)
-    return render_template('opinion.html', opinion=opinion)
+    return render_template('opinion.html', opinion=opinion) # noqa
